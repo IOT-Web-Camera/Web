@@ -1,0 +1,231 @@
+/* ================================
+   TAILWIND LAYERS
+   ================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================
+   PALETTE SODIUM VISION – LIGHT
+   ================================ */
+:root {
+    --sv-bg: #ffffff;             /* Blanc principal */
+    --sv-bg-soft: #f3f4f6;        /* Gris clair pour sections */
+    --sv-bg-hover: #e5e7eb;       /* Hover léger */
+
+    --sv-text: #1f2937;           /* Gris foncé pour texte */
+    --sv-text-muted: #4b5563;     /* Gris secondaire */
+
+    --sv-accent: #6366f1;         /* Violet principal */
+    --sv-accent-light: #818cf8;   /* Violet clair */
+
+    --sv-glass: rgba(255, 255, 255, 0.6);
+    --sv-border: rgba(0,0,0,0.1);
+}
+
+/* ================================
+   GLOBAL
+   ================================ */
+body {
+    background: #f9fafb; /* Gris très clair */
+    color: var(--sv-text);
+    font-family: 'Inter', sans-serif;
+}
+
+/* Smooth hover effect */
+* {
+    transition: all 0.2s ease;
+}
+
+/* ================================
+   NAVBAR
+   ================================ */
+.navbar {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--sv-border);
+}
+
+.navbar-item,
+.navbar-link {
+    color: var(--sv-text) !important;
+}
+
+.navbar-item:hover,
+.navbar-link:hover {
+    background: var(--sv-bg-hover) !important;
+    color: var(--sv-accent) !important;
+}
+
+.navbar-item.is-active {
+    color: var(--sv-accent) !important;
+}
+
+/* ================================
+   BUTTONS
+   ================================ */
+.button.is-primary {
+    background: linear-gradient(135deg, var(--sv-accent), var(--sv-accent-light));
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+}
+
+.button.is-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+}
+
+.button.is-light {
+    background: var(--sv-glass);
+    border: 1px solid var(--sv-border);
+    color: var(--sv-text);
+}
+
+.button.is-light:hover {
+    background: var(--sv-bg-soft);
+}
+
+/* ================================
+   HERO SECTION
+   ================================ */
+.hero {
+    background: transparent;
+}
+
+/* ================================
+   BOXES (FEATURES)
+   ================================ */
+.box {
+    background: var(--sv-glass);
+    border: 1px solid var(--sv-border);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    color: var(--sv-text);
+}
+
+.box:hover {
+    transform: translateY(-5px);
+    border-color: var(--sv-accent);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* ================================
+   TITRES
+   ================================ */
+.title {
+    color: var(--sv-text);
+}
+
+.subtitle {
+    color: var(--sv-text-muted);
+}
+
+/* ================================
+   ICONS
+   ================================ */
+.icon {
+    transition: transform 0.2s ease;
+}
+
+.box:hover .icon {
+    transform: scale(1.2);
+    color: var(--sv-accent);
+}
+
+/* ================================
+   LINKS
+   ================================ */
+a {
+    color: var(--sv-accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--sv-accent-light);
+}
+
+/* ================================
+   CTA SECTION
+   ================================ */
+section.has-text-centered {
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(99, 102, 241, 0.08)
+    );
+}
+
+/* ================================
+   IMAGE HERO
+   ================================ */
+img {
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-wrapper {
+    animation: fadeUp 0.6s ease;
+}
+
+/* ================================
+   AVATAR (menu utilisateur)
+   ================================ */
+.navbar-link {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--sv-accent);
+    color: white !important;
+    font-weight: 600;
+}
+
+footer.footer {
+    background: var(--sv-glass);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--sv-border);
+}
+
+footer .title {
+    margin-bottom: 0.75rem;
+}
+
+footer a.footer-link {
+    color: var(--sv-text-muted);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+footer a.footer-link:hover {
+    color: var(--sv-accent);
+}
+
+footer .social-link {
+    color: var(--sv-text-muted);
+    margin-right: 0.5rem;
+    font-size: 1.3rem;
+    transition: transform 0.2s, color 0.2s;
+}
+
+footer .social-link:hover {
+    color: var(--sv-accent);
+    transform: translateY(-3px);
+}
