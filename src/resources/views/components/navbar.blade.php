@@ -17,7 +17,6 @@
             <div class="navbar-start">
                 @auth
                     <a href="/dashboard" class="navbar-item">Dashboard</a>
-                    <a href="/cameras" class="navbar-item">Mes caméras</a>
                 @endauth
             </div>
 

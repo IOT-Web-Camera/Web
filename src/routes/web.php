@@ -23,8 +23,16 @@ Route::get('/', function () {
 // Routes nécessitant l'authentification
 Route::middleware('auth')->group(function () {
 
+    // Page Événements & Statistiques
+    Route::get('/events', [CameraEventController::class, 'eventsPage'])
+        ->name('events');
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Changement de mot de passe
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])
+        ->name('password.update');
 
     // Profil utilisateur
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -33,14 +41,14 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    // Routes commandes — doivent être placées AVANT les routes caméras
+    // Routes commandes
     Route::prefix('dashboard/cameras/{name}/cmd')->name('cameras.cmd.')->group(function () {
         Route::post('/led',    [CommandController::class, 'led'])->name('led');
         Route::post('/move',   [CommandController::class, 'move'])->name('move');
         Route::post('/reboot', [CommandController::class, 'reboot'])->name('reboot');
     });
 
-// Caméras
+    // Caméras
     Route::prefix('cameras')->name('cameras.')->group(function () {
         Route::get('/', [CameraController::class, 'index'])->name('index');
         Route::get('/create', [CameraController::class, 'create'])->name('create');
@@ -48,22 +56,17 @@ Route::middleware('auth')->group(function () {
         Route::get('/{camera}', [CameraController::class, 'show'])->name('show');
         Route::delete('/{camera}', [CameraController::class, 'destroy'])->name('destroy');
     });
-
 });
 
-
+// Stream
 Route::get('/stream/{name}', [CameraController::class, 'stream'])
     ->name('cameras.stream')
     ->middleware('auth');
 
-Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
 
 
-
-// Auth routes (login/register)
+// Auth routes
 require __DIR__ . '/auth.php';
-include_once __DIR__ . '/auth.php';
 
 // API routes
 require __DIR__ . '/api.php';
-include_once __DIR__ . '/api.php';

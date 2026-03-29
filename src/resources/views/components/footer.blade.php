@@ -37,8 +37,6 @@
                 <ul style="list-style: none; padding-left: 0;">
                     <li><a href="/faq" class="footer-link">FAQ</a></li>
                     <li><a href="/contact" class="footer-link">Contact</a></li>
-                    <li><a href="/terms" class="footer-link">Conditions</a></li>
-                    <li><a href="/privacy" class="footer-link">Confidentialité</a></li>
                 </ul>
             </div>
 

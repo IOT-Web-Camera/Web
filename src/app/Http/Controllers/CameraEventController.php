@@ -49,4 +49,18 @@ class CameraEventController extends Controller
             ->take(20)
             ->get();
     }
+
+    public function eventsPage()
+    {
+        $cameras = Camera::where('owner_id', auth()->id())->get();
+
+        foreach ($cameras as $camera) {
+            $camera->events = CameraEvent::where('device', $camera->name)
+                ->latest()
+                ->take(200)
+                ->get();
+        }
+
+        return view('pages.events.index', compact('cameras'));
+    }
 }
