@@ -57,12 +57,6 @@ Route::get('/stream/{name}', [CameraController::class, 'stream'])
     ->middleware('auth');
 
 Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
-Route::post('/api/camera/heartbeat', [CameraController::class, 'heartbeat']);
-Route::post('/api/camera/status', [CameraController::class, 'cameraStatus']);
-Route::get('/api/bridge/status', [CommandController::class, 'bridgeStatus']);
-Route::post('/camera/event', [CameraEventController::class, 'handle']);
-Route::get('/camera/events/{device}', [CameraEventController::class, 'list']);
-
 
 // Auth routes (login/register)
 require __DIR__ . '/auth.php';
