@@ -9,14 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('camera_events', function (Blueprint $table) {
             $table->id();
-            $table->string('device');      // nom de la caméra
-            $table->string('type');        // telemetry, LED_ACK, MOVE_ACK, etc.
-            $table->json('payload');       // données envoyées par la caméra
+            $table->string('device');
+            $table->string('type');
+            $table->json('payload')->nullable();
             $table->timestamps();
+
+            $table->index('device');
         });
     }
 

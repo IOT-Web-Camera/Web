@@ -58,5 +58,12 @@ Route::get('/stream/{name}', [CameraController::class, 'stream'])
 
 Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
 
+
+
 // Auth routes (login/register)
 require __DIR__ . '/auth.php';
+include_once __DIR__ . '/auth.php';
+
+// API routes
+require __DIR__ . '/api.php';
+include_once __DIR__ . '/api.php';

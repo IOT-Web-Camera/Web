@@ -23,6 +23,11 @@ class CameraEventController extends Controller
     // Récupération des derniers événements pour le dashboard
     public function list($device)
     {
+        // Vérifie que la caméra appartient à l'user connecté
+        $camera = Camera::where('name', $device)
+            ->where('owner_id', auth()->id())
+            ->firstOrFail();
+
         return CameraEvent::where('device', $device)
             ->latest()
             ->take(20)
