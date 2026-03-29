@@ -48,10 +48,8 @@
             <div class="column is-3">
                 <h3 class="title is-6" style="color: var(--sv-accent);">Suivez-nous</h3>
                 <div class="social-icons" style="margin-top: 1rem;">
-                    <a href="#" class="icon is-large social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="icon is-large social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="icon is-large social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="icon is-large social-link"><i class="fab fa-github"></i></a>
+                    <a href="https://www.youtube.com/@gauthierdefrance6143" class="icon is-large social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="https://github.com/IOT-Web-Camera" class="icon is-large social-link"><i class="fab fa-github"></i></a>
                 </div>
             </div>
 
