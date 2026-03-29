@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camera;
 use Illuminate\Http\Request;
 use App\Models\CameraEvent;
 use Illuminate\Routing\Controller;
