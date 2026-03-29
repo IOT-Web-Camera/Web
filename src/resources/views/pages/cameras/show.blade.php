@@ -209,6 +209,17 @@
                             </div>
                         </div>
 
+                        <div class="box mt-4">
+                            <p class="control-group-label" style="margin-bottom: 1.25rem;">
+                                <i class="fas fa-microchip" style="margin-right: 4px;"></i> Télémetrie
+                            </p>
+
+                            <div id="telemetry-box" class="mono" style=" font-size: 0.85rem; color: var(--sodium-muted); line-height: 1.4;">
+                                <em>Aucune donnée reçue...</em>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
             </div>
