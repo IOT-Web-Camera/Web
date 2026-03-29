@@ -12,3 +12,10 @@ Route::post('/camera/heartbeat', [CameraController::class, 'heartbeat']);
 Route::post('/camera/status', [CameraController::class, 'cameraStatus']);
 
 Route::get('/bridge/status', [CommandController::class, 'bridgeStatus']);
+
+Route::post('/api/test', function (\Illuminate\Http\Request $request) {
+    \Log::info('TEST API REÇU', $request->all());
+    return response()->json([
+        'received' => $request->all()
+    ]);
+});
