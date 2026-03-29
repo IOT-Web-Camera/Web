@@ -12,10 +12,16 @@ class DashboardController extends Controller
         $activeCameras    = Camera::where('owner_id', auth()->id())
             ->where('is_active', true)
             ->get();
-
         $totalUserCameras = Camera::where('owner_id', auth()->id())->count();
         $serverIp         = config('app.mediamtx_host');
 
-        return view('pages.dashboard.index', compact('activeCameras', 'totalUserCameras', 'serverIp'));
+        // Token valable 2h pour le stream
+        $streamToken = auth()->user()
+            ->createToken('stream', ['stream:read'], now()->addHours(2))
+            ->plainTextToken;
+
+        return view('pages.dashboard.index', compact(
+            'activeCameras', 'totalUserCameras', 'serverIp', 'streamToken'
+        ));
     }
 }

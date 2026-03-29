@@ -91,10 +91,10 @@ class CameraController extends Controller
 
     public function mediamtxAuth(Request $request)
     {
-        $path   = $request->input('path');   // nom de la caméra
+        $path   = $request->input('path');
         $action = $request->input('action'); // "publish" ou "read"
-        $user   = $request->input('user');
-        $pass   = $request->input('password');
+        $user   = $request->input('user', '');
+        $pass   = $request->input('password', '');
 
         $camera = Camera::where('name', $path)->first();
 
@@ -102,15 +102,15 @@ class CameraController extends Controller
             return response()->json(['error' => 'Camera not found'], 401);
         }
 
-        // Publication : vérifie le mot de passe du flux
+        // Publication : le Pi s'authentifie avec stream_pass
         if ($action === 'publish') {
             if ($pass === $camera->stream_pass) {
-                return response()->json(['success' => true]);
+                return response()->noContent(); // 200
             }
             return response()->json(['error' => 'Wrong password'], 401);
         }
 
-        // Lecture : vérifie que le token appartient au bon user
+        // Lecture : token Sanctum passé comme password
         if ($action === 'read') {
             $token = \Laravel\Sanctum\PersonalAccessToken::findToken($pass);
 
@@ -118,11 +118,10 @@ class CameraController extends Controller
                 return response()->json(['error' => 'Invalid token'], 401);
             }
 
-            $user = $token->tokenable;
+            $viewer = $token->tokenable;
 
-            // Vérifie que la caméra appartient à cet user
-            if ($camera->owner_id === $user->id) {
-                return response()->json(['success' => true]);
+            if ($camera->owner_id === $viewer->id) {
+                return response()->noContent(); // 200
             }
 
             return response()->json(['error' => 'Forbidden'], 403);

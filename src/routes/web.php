@@ -58,7 +58,6 @@ Route::get('/stream/{name}', [CameraController::class, 'stream'])
     ->name('cameras.stream')
     ->middleware('auth');
 
-// API appelée par MediaMTX
 Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
 
 
