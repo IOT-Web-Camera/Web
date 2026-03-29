@@ -76,10 +76,9 @@
                             {{-- Vidéo --}}
                             <div class="video-container" style="border-radius: 0;">
                                 <iframe
-                                    src="http://{{ config('app.mediamtx_host') }}:8889/{{ $camera->name }}?user={{ auth()->user()->username }}&password={{ $token }}"
+                                    src="http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}?user={{ $cam->stream_user }}&password={{ $cam->stream_pass }}"
                                     allowfullscreen>
                                 </iframe>
-                                ```
                             </div>
                             {{-- Footer carte --}}
                             <div style="padding: 0.75rem 1rem;">
