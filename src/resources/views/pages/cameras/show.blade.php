@@ -219,7 +219,6 @@
     {{-- Toast feedback --}}
     <div id="toast" class="feedback-toast"></div>
 @endsection
-
 @push('scripts')
     <script>
         async function sendOrder(action, payload = {}) {
@@ -230,6 +229,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify(payload)
@@ -251,9 +251,16 @@
         // Statut de connexion (ping bridge)
         async function checkBridgeStatus() {
             try {
-                const res = await fetch('/api/bridge/status', { method: 'GET' });
+                const res = await fetch('/api/bridge/status', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
                 const dot = document.getElementById('status-dot');
                 const txt = document.getElementById('status-text');
+
                 if (res.ok) {
                     dot.style.background = '#10B981';
                     txt.textContent = 'Connecté';
@@ -262,8 +269,10 @@
                     txt.textContent = 'Déconnecté';
                 }
             } catch {
-                document.getElementById('status-dot').style.background = '#EF4444';
-                document.getElementById('status-text').textContent = 'Déconnecté';
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+                dot.style.background = '#EF4444';
+                txt.textContent = 'Déconnecté';
             }
         }
 

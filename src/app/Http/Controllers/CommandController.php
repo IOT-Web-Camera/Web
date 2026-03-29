@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Camera;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Http;
 
 class CommandController extends Controller
 {
@@ -58,8 +59,9 @@ class CommandController extends Controller
     private function sendToBridge(array $order): bool
     {
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(3)
-                ->post('http://127.0.0.1:8766/cmd', $order);
+            $response = Http::timeout(3)
+                ->post('http://host.docker.internal:8766/cmd', $order);
+
 
             return $response->successful();
         } catch (\Exception $e) {
@@ -72,8 +74,8 @@ class CommandController extends Controller
     public function bridgeStatus()
     {
         try {
-            $response = \Illuminate\Support\Facades\Http::timeout(2)
-                ->get('http://localhost:8766/status');
+            $response = Http::timeout(2)
+                ->get('http://host.docker.internal:8766/status');
 
             return response()->json($response->json());
         } catch (\Exception $e) {
