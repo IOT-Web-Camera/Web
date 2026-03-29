@@ -59,7 +59,7 @@ class CommandController extends Controller
     {
         try {
             $response = \Illuminate\Support\Facades\Http::timeout(3)
-                ->post('http://51.210.11.74/cmd', $order);
+                ->post('http://127.0.0.1:8766/cmd', $order);
 
             return $response->successful();
         } catch (\Exception $e) {
@@ -67,6 +67,7 @@ class CommandController extends Controller
             return false;
         }
     }
+
 
     public function bridgeStatus()
     {
