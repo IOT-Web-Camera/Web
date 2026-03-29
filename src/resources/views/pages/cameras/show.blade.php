@@ -221,6 +221,10 @@
 @endsection
 @push('scripts')
     <script>
+
+        /* ---------------------------------------------------------
+           1) ENVOI DES COMMANDES À LA CAMÉRA
+        --------------------------------------------------------- */
         async function sendOrder(action, payload = {}) {
             const url = `/dashboard/cameras/{{ $camera->name }}/cmd/${action}`;
 
@@ -248,14 +252,14 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        // Statut de connexion (ping bridge)
+        /* ---------------------------------------------------------
+           2) STATUT DU BRIDGE (PING)
+        --------------------------------------------------------- */
         async function checkBridgeStatus() {
             try {
                 const res = await fetch('/api/bridge/status', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 const dot = document.getElementById('status-dot');
@@ -278,5 +282,54 @@
 
         checkBridgeStatus();
         setInterval(checkBridgeStatus, 5000);
+
+        /* ---------------------------------------------------------
+           3) POLLING LÉGER : RÉCUPÉRATION DES ÉVÉNEMENTS CAMÉRA
+        --------------------------------------------------------- */
+        async function fetchCameraEvents() {
+            try {
+                const res = await fetch('/api/camera/events/{{ $camera->name }}');
+                const events = await res.json();
+                updateCameraUI(events);
+            } catch (e) {
+                console.warn("Impossible de récupérer les événements :", e);
+            }
+        }
+
+        setInterval(fetchCameraEvents, 2000);
+        fetchCameraEvents();
+
+        /* ---------------------------------------------------------
+           4) MISE À JOUR DU DASHBOARD
+        --------------------------------------------------------- */
+        function updateCameraUI(events) {
+            if (!events.length) return;
+
+            const last = events[0]; // dernier événement
+            const box = document.getElementById("telemetry-box");
+
+            // --- Télémetrie ---
+            if (last.type === "telemetry") {
+                const t = last.payload;
+
+                box.innerHTML = `
+                <div><b>Température :</b> ${t.temperature}°C</div>
+                <div><b>Batterie :</b> ${t.battery}%</div>
+                <div><b>Signal :</b> ${t.signal} dBm</div>
+                <div><b>Uptime :</b> ${Math.round(t.uptime)}s</div>
+            `;
+            }
+
+            // --- ACK LED ---
+            if (last.type === "LED_ACK") {
+                showToast("LED confirmée par la caméra");
+            }
+
+            // --- ACK MOVE ---
+            if (last.type === "MOVE_ACK") {
+                showToast("Mouvement exécuté");
+            }
+        }
+
     </script>
 @endpush
