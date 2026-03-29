@@ -9,13 +9,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $activeCameras    = Camera::where('owner_id', auth()->id())
-            ->where('is_active', true)
-            ->get();
-        $totalUserCameras = Camera::where('owner_id', auth()->id())->count();
+        $userCameras      = Camera::where('owner_id', auth()->id())->get();
+        $totalUserCameras = $userCameras->count();
         $serverIp         = config('app.mediamtx_host');
 
-        // Token valable 2h pour le stream
+        // Caméra considérée active si heartbeat < 35 secondes
+        $activeCameras = $userCameras->filter(
+            fn($cam) => $cam->last_heartbeat &&
+                $cam->last_heartbeat->gt(now()->subSeconds(35))
+        );
+
         $streamToken = auth()->user()
             ->createToken('stream', ['stream:read'], now()->addHours(2))
             ->plainTextToken;

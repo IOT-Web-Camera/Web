@@ -120,4 +120,24 @@ class CameraController extends Controller
     }
 
 
+    public function heartbeat(Request $request)
+    {
+        $name   = $request->input('path');
+        $action = $request->input('action');
+
+        if (in_array($action, ['publish', 'read'])) {
+            Camera::where('name', $name)->update([
+                'last_heartbeat' => now(),
+                'is_active'      => true,
+            ]);
+        }
+
+        if ($action === 'unpublish') {
+            Camera::where('name', $name)->update(['is_active' => false]);
+        }
+
+        return response()->noContent();
+    }
+
+
 }
