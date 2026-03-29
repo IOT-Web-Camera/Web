@@ -91,43 +91,32 @@ class CameraController extends Controller
 
     public function mediamtxAuth(Request $request)
     {
-        $path   = $request->input('path');
-        $action = $request->input('action'); // "publish" ou "read"
-        $user   = $request->input('user', '');
-        $pass   = $request->input('password', '');
+        $action = $request->input('action');
 
-        $camera = Camera::where('name', $path)->first();
-
-        if (!$camera) {
-            return response()->json(['error' => 'Camera not found'], 401);
+        // Lecture toujours autorisée
+        if ($action === 'read') {
+            return response()->noContent();
         }
 
-        // Publication : le Pi s'authentifie avec stream_pass
+        // Publication : vérifie le mot de passe
         if ($action === 'publish') {
-            if ($pass === $camera->stream_pass) {
-                return response()->noContent(); // 200
+            $path   = $request->input('path');
+            $pass   = $request->input('password', '');
+
+            $camera = Camera::where('name', $path)->first();
+
+            if (!$camera) {
+                return response()->json(['error' => 'Camera not found'], 401);
             }
+
+            if ($pass === $camera->stream_pass) {
+                return response()->noContent();
+            }
+
             return response()->json(['error' => 'Wrong password'], 401);
         }
 
-        // Lecture : token Sanctum passé comme password
-        if ($action === 'read') {
-            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($pass);
-
-            if (!$token) {
-                return response()->json(['error' => 'Invalid token'], 401);
-            }
-
-            $viewer = $token->tokenable;
-
-            if ($camera->owner_id === $viewer->id) {
-                return response()->noContent(); // 200
-            }
-
-            return response()->json(['error' => 'Forbidden'], 403);
-        }
-
-        return response()->json(['error' => 'Unknown action'], 400);
+        return response()->noContent();
     }
 
 
