@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Camera;
+use Illuminate\Routing\Controller;
 
 class DashboardController extends Controller
 {

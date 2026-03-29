@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'mediamtx_host' => env('MEDIAMTX_HOST', null),
+
 ];
