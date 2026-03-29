@@ -44,14 +44,18 @@ class CameraController extends Controller
     // Vue d'une caméra
     public function show(Camera $camera)
     {
-        // Token valable 1h, supprimé après
+        // Vérifie que la caméra appartient à l'user connecté
+        if ($camera->owner_id !== auth()->id()) {
+            abort(403);
+        }
+
         $token = auth()->user()->createToken(
             'stream-' . $camera->name,
             ['stream:read'],
             now()->addHour()
         )->plainTextToken;
 
-        return view('pages.dashboard.cameras.show', compact('camera', 'token'));
+        return view('pages.cameras.show', compact('camera', 'token'));
     }
 
     // Supprime une caméra

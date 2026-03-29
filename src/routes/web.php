@@ -33,23 +33,11 @@ Route::middleware('auth')->group(function () {
 
     // Caméras
     Route::prefix('cameras')->name('cameras.')->group(function () {
-
-        // Liste des caméras de l'utilisateur
         Route::get('/', [CameraController::class, 'index'])->name('index');
-
-        // Création d'une caméra
         Route::get('/create', [CameraController::class, 'create'])->name('create');
         Route::post('/', [CameraController::class, 'store'])->name('store');
-
-        // Vue d'une caméra spécifique
-        Route::get('/{camera}', [CameraController::class, 'show'])
-            ->name('show')
-            ->middleware('can:view,camera'); // Vérifie que l'utilisateur peut voir sa caméra
-
-        // Suppression d'une caméra
-        Route::delete('/{camera}', [CameraController::class, 'destroy'])
-            ->name('destroy')
-            ->middleware('can:delete,camera'); // Vérifie que l'utilisateur peut supprimer sa caméra
+        Route::get('/{camera}', [CameraController::class, 'show'])->name('show');
+        Route::delete('/{camera}', [CameraController::class, 'destroy'])->name('destroy');
     });
 });
 
