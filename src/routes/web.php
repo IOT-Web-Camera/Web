@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CameraController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SupportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,13 @@ use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return view('pages.home.home');
 })->name('home');
+
+
+Route::prefix('support')->name('support.')->group(function () {
+    Route::get('/faq', [SupportController::class, 'faq'])->name('faq');
+    Route::get('/contact', [SupportController::class, 'contact'])->name('contact');
+});
+
 
 // Routes nécessitant l'authentification
 Route::middleware('auth')->group(function () {

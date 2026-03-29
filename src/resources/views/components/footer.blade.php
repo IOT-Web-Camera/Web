@@ -23,9 +23,9 @@
                 <h3 class="title is-6" style="color: var(--sv-accent);">Liens rapides</h3>
                 <ul style="list-style: none; padding-left: 0;">
                     <li><a href="/" class="footer-link">Accueil</a></li>
-                    <li><a href="/dashboard" class="footer-link">Dashboard</a></li>
-                    <li><a href="/profile" class="footer-link">Profil</a></li>
-                    <li><a href="/cameras" class="footer-link">Mes caméras</a></li>
+                    <li><a href="{{route('dashboard')}}" class="footer-link">Dashboard</a></li>
+                    <li><a href="{{route('profile.edit')}}" class="footer-link">Profil</a></li>
+                    <li><a href="{{route('cameras.index')}}" class="footer-link">Mes caméras</a></li>
                 </ul>
             </div>
 
@@ -35,8 +35,8 @@
             <div class="column is-3">
                 <h3 class="title is-6" style="color: var(--sv-accent);">Support</h3>
                 <ul style="list-style: none; padding-left: 0;">
-                    <li><a href="/faq" class="footer-link">FAQ</a></li>
-                    <li><a href="/contact" class="footer-link">Contact</a></li>
+                    <li><a href="{{route('support.faq')}}" class="footer-link">FAQ</a></li>
+                    <li><a href="{{route('support.contact')}}" class="footer-link">Contact</a></li>
                 </ul>
             </div>
 
