@@ -35,4 +35,9 @@ class Camera extends Model
             $table->timestamp('last_heartbeat')->nullable();
         });
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'name';
+    }
 }

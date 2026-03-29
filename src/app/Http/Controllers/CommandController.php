@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Camera;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class CommandController extends Controller
 {
@@ -54,15 +55,17 @@ class CommandController extends Controller
     /**
      * Envoie l'ordre au bridge Python via HTTP
      */
-    private function sendToBridge(array $order): void
+    private function sendToBridge(array $order): bool
     {
-        $ch = curl_init('http://localhost:8766/cmd'); // endpoint HTTP du bridge
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($order));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-        curl_exec($ch);
-        curl_close($ch);
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(3)
+                ->post('http://localhost:8766/cmd', $order);
+
+            return $response->successful();
+        } catch (\Exception $e) {
+            \Log::error('Bridge injoignable', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
+
 }

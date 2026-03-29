@@ -140,4 +140,29 @@ class CameraController extends Controller
     }
 
 
+    public function cameraStatus(Request $request)
+    {
+        $name    = $request->input('camera_name');
+        $payload = $request->input('payload', []);
+
+        $camera = Camera::where('name', $name)->first();
+
+        if (!$camera) {
+            return response()->json(['error' => 'Camera not found'], 404);
+        }
+
+        // Met à jour les infos remontées par la caméra
+        $camera->update([
+            'last_heartbeat' => now(),
+            'is_active'      => true,
+        ]);
+
+        // Tu pourras stocker d'autres infos plus tard
+        // ex: température, état LED, position servo...
+        \Log::info("Status caméra {$name}", $payload);
+
+        return response()->noContent();
+    }
+
+
 }

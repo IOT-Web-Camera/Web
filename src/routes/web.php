@@ -60,6 +60,7 @@ Route::get('/stream/{name}', [CameraController::class, 'stream'])
 
 Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
 Route::post('/api/camera/heartbeat', [CameraController::class, 'heartbeat']);
+Route::post('/api/camera/status', [CameraController::class, 'cameraStatus']);
 
 
 // Auth routes (login/register)
