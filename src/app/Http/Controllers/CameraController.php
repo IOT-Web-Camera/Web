@@ -42,15 +42,16 @@ class CameraController extends Controller
     }
 
     // Vue d'une caméra
-    public function show(string $name)
+    public function show(Camera $camera)
     {
-        $camera = Camera::where('name', $name)
-            ->where('owner_id', auth()->id())
-            ->firstOrFail();
+        // Token valable 1h, supprimé après
+        $token = auth()->user()->createToken(
+            'stream-' . $camera->name,
+            ['stream:read'],
+            now()->addHour()
+        )->plainTextToken;
 
-        $serverIp = config('app.mediamtx_host');
-
-        return view('pages.cameras.show', compact('camera', 'serverIp'));
+        return view('pages.dashboard.cameras.show', compact('camera', 'token'));
     }
 
     // Supprime une caméra
@@ -64,4 +65,71 @@ class CameraController extends Controller
 
         return redirect()->route('cameras.index')->with('success', 'Caméra supprimée.');
     }
+
+
+
+    public function stream(string $name)
+    {
+        $camera = Camera::where('name', $name)
+            ->where('owner_id', auth()->id())
+            ->firstOrFail();
+
+        $serverIp = config('app.mediamtx_host');
+
+        // Redirige vers MediaMTX avec les credentials côté serveur
+        $url = "http://{$serverIp}:8889/{$camera->name}/";
+
+        $response = \Illuminate\Support\Facades\Http::withBasicAuth(
+            $camera->stream_user,
+            $camera->stream_pass
+        )->get($url);
+
+        return response($response->body(), 200)
+            ->header('Content-Type', $response->header('Content-Type'));
+    }
+
+
+    public function mediamtxAuth(Request $request)
+    {
+        $path   = $request->input('path');   // nom de la caméra
+        $action = $request->input('action'); // "publish" ou "read"
+        $user   = $request->input('user');
+        $pass   = $request->input('password');
+
+        $camera = Camera::where('name', $path)->first();
+
+        if (!$camera) {
+            return response()->json(['error' => 'Camera not found'], 401);
+        }
+
+        // Publication : vérifie le mot de passe du flux
+        if ($action === 'publish') {
+            if ($pass === $camera->stream_pass) {
+                return response()->json(['success' => true]);
+            }
+            return response()->json(['error' => 'Wrong password'], 401);
+        }
+
+        // Lecture : vérifie que le token appartient au bon user
+        if ($action === 'read') {
+            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($pass);
+
+            if (!$token) {
+                return response()->json(['error' => 'Invalid token'], 401);
+            }
+
+            $user = $token->tokenable;
+
+            // Vérifie que la caméra appartient à cet user
+            if ($camera->owner_id === $user->id) {
+                return response()->json(['success' => true]);
+            }
+
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        return response()->json(['error' => 'Unknown action'], 400);
+    }
+
+
 }

@@ -75,7 +75,11 @@
                             </div>
                             {{-- Vidéo --}}
                             <div class="video-container" style="border-radius: 0;">
-                                <iframe src="http://{{ $serverIp }}:8889/{{ $cam->name }}/" allowfullscreen></iframe>
+                                <iframe
+                                    src="http://{{ config('app.mediamtx_host') }}:8889/{{ $camera->name }}?user={{ auth()->user()->username }}&password={{ $token }}"
+                                    allowfullscreen>
+                                </iframe>
+                                ```
                             </div>
                             {{-- Footer carte --}}
                             <div style="padding: 0.75rem 1rem;">
