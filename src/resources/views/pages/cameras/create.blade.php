@@ -4,15 +4,6 @@
 @section('content')
     <div class="page-wrapper">
 
-        {{-- Breadcrumb --}}
-        <nav class="breadcrumb mb-4" aria-label="breadcrumbs">
-            <ul>
-                <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ route('cameras.index') }}">Caméras</a></li>
-                <li class="is-active"><a href="#" aria-current="page">Ajouter</a></li>
-            </ul>
-        </nav>
-
         <div class="columns is-centered">
             <div class="column is-5">
 
