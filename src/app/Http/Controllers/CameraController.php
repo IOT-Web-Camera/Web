@@ -11,13 +11,13 @@ class CameraController extends Controller
     public function index()
     {
         $cameras = Camera::where('owner_id', auth()->id())->get();
-        return view('dashboard.cameras.index', compact('cameras'));
+        return view('pages.cameras.index', compact('cameras'));
     }
 
     // Formulaire d'ajout
     public function create()
     {
-        return view('dashboard.cameras.create');
+        return view('pages.cameras.create');
     }
 
     // Enregistre une nouvelle caméra
@@ -49,7 +49,7 @@ class CameraController extends Controller
 
         $serverIp = config('app.mediamtx_host');
 
-        return view('dashboard.cameras.show', compact('camera', 'serverIp'));
+        return view('pages.cameras.show', compact('camera', 'serverIp'));
     }
 
     // Supprime une caméra

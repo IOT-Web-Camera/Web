@@ -15,6 +15,6 @@ class DashboardController extends Controller
         $totalUserCameras = Camera::where('owner_id', auth()->id())->count();
         $serverIp         = config('app.mediamtx_host');
 
-        return view('dashboard.index', compact('activeCameras', 'totalUserCameras', 'serverIp'));
+        return view('pages.dashboard.index', compact('activeCameras', 'totalUserCameras', 'serverIp'));
     }
 }

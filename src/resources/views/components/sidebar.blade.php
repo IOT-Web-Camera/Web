@@ -21,12 +21,13 @@
         .sidebar {
             width: 240px;
             position: fixed;
-            top: 3.25rem; /* navbar height */
+            top: 3.25rem; /* hauteur navbar */
             bottom: 0;
             left: 0;
             background-color: #f5f5f5;
             padding: 2rem 1rem;
             overflow-y: auto;
+            z-index: 20; /* au-dessus du contenu principal */
         }
 
         .sidebar .menu-label {

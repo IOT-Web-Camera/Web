@@ -12,7 +12,11 @@
                     {{-- Texte --}}
                     <div class="column is-6">
                         <h1 class="title" style="font-size: 2.2rem; font-weight: 700;">
-                            Surveillance intelligente, simple et rapide
+                            @auth
+                                Bonjour <span>{{ auth()->user()->name }}</span>
+                            @else
+                                Bienvenue sur <span>Sodium Vision</span>
+                            @endauth
                         </h1>
                         <p class="subtitle" style="font-size: 1.1rem; color: var(--sodium-muted);">
                             Sodium Vision vous permet de connecter, visualiser et contrôler vos caméras Raspberry Pi en temps réel.

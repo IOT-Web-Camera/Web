@@ -6,31 +6,36 @@
 
     <!-- Bulma -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Ton CSS global -->
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
 </head>
+<body style="min-height: 100vh">
 
-<body style="min-height: 100vh; display: flex; flex-direction: column;">
-
-@include('components.navbar')
-
-<div style="display: flex; flex: 1;">
-    @auth
+@auth
+    <aside class="sidebar">
         @include('components.sidebar')
-    @endauth
+    </aside>
+@endauth
 
-    <main class="section" style="flex: 1; min-height: 100vh; padding-left: 1rem; padding-right: 1rem;">
+<main class="main-content" style="flex: 1; min-height: 100vh; padding: 2rem;">
+    @include('components.navbar')
+
+    <section class="section">
         <div class="container">
             @yield('content')
         </div>
-    </main>
-</div>
+    </section>
+</main>
 
 @include('components.footer')
 
+
 @stack('scripts')
 </body>
+
+
 </html>

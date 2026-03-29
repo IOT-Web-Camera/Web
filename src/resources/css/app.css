@@ -41,8 +41,7 @@ body {
    NAVBAR
    ================================ */
 .navbar {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255);
     border-bottom: 1px solid var(--sv-border);
 }
 
@@ -229,3 +228,573 @@ footer .social-link:hover {
     color: var(--sv-accent);
     transform: translateY(-3px);
 }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #fff;
+    overflow: hidden;
+}
+
+.auth-shell {
+    display: flex;
+    height: 100vh;
+    width: 100%; /* <-- ici, remplace 100vw par 100% */
+    overflow-x: hidden; /* sécurité */
+}
+/* ── Panneau gauche ── */
+.auth-left {
+    flex: 1;
+    background: #0A0A0F;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+}
+
+.auth-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(37,99,235,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.08) 1px, transparent 1px);
+    background-size: 48px 48px;
+}
+
+.auth-left::after {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 65%);
+    pointer-events: none;
+}
+
+.auth-brand {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-brand-dot {
+    width: 9px;
+    height: 9px;
+    background: #2563EB;
+    border-radius: 50%;
+    animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.auth-brand-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.auth-left-content {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-left-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+}
+
+.auth-left-title span { color: #2563EB; }
+
+.auth-left-desc {
+    font-size: 0.9rem;
+    color: #6B7280;
+    line-height: 1.7;
+    max-width: 300px;
+}
+
+/* Features list */
+.auth-features {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.auth-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+.auth-feature-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(37,99,235,0.15);
+    border: 1px solid rgba(37,99,235,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2563EB;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* ── Panneau droit ── */
+.auth-right {
+    flex: 1; /* prendre l'espace restant au lieu d'une largeur fixe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem; /* un peu moins que 3rem */
+    overflow-y: auto;
+    min-width: 220px; /* pour que ça ne devienne pas trop petit */
+}
+
+.auth-form-wrapper {
+    width: 100%;
+    max-width: 500px; /* formulaire pas trop large */
+    animation: slideUp 0.4s ease both;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-form-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0A0A0F;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+}
+
+.auth-form-sub {
+    font-size: 0.875rem;
+    color: #9CA3AF;
+    margin-bottom: 2rem;
+}
+
+.field-group { margin-bottom: 1.1rem; }
+
+.field-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.4rem;
+}
+
+.field-input {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    color: #111827;
+    background: #FAFAFA;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+}
+
+.field-input:focus {
+    border-color: #2563EB;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+
+.field-input.is-danger { border-color: #EF4444; }
+
+/* Champs côte à côte */
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 0.8rem;
+    background: #0A0A0F;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 0.5rem;
+}
+
+.btn-submit:hover { background: #1a1a24; }
+.btn-submit:active { transform: scale(0.99); }
+
+.auth-error {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.8rem;
+    color: #DC2626;
+}
+
+.auth-footer-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: #9CA3AF;
+}
+
+.auth-footer-link a {
+    color: #2563EB;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    body { overflow: auto; }
+    .auth-shell { flex-direction: column; height: auto; }
+    .auth-left { display: none; }
+    .auth-right { width: 100%; min-height: 100vh; }
+    .field-row { grid-template-columns: 1fr; }
+}
+
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9CA3AF; /* gris doux */
+    font-size: 1rem;
+    padding: 0;
+}
+
+.toggle-password:hover {
+    color: #2563EB; /* ton bleu Sodium Vision */
+}
+
+.password-wrapper .field-input {
+    padding-right: 2.75rem;
+}
+
+.auth-shell {
+    height: calc(100vh - 3.25rem);
+    margin-top: 3.25rem;
+}
+
+/* espace entre boutons sans toucher au background du navbar-item */
+.sv-auth-buttons .buttons {
+    display: flex;
+    gap: 0.5rem;         /* espace entre boutons */
+    align-items: center;
+    background: transparent; /* s'assure qu'aucun fond n'apparaisse */
+    padding: 0;              /* retire padding par défaut si besoin */
+}
+
+/* évite que le hover de la navbar-item colore l'arrière-plan */
+.sv-auth-buttons:hover {
+    background: transparent !important;
+}
+
+/* mobile : empiler et boutons pleine largeur */
+@media (max-width: 768px) {
+    .sv-auth-buttons .buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    .sv-auth-buttons .buttons .button {
+        width: 100%;
+    }
+}
+
+/* style de base pour le lien */
+.nav-link {
+    position: relative;
+    overflow: visible;
+    color: var(--sv-text);
+}
+
+/* pseudo-élément qui sert de barre */
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;               /* ajuster l'écart sous le lien */
+    height: 3px;                /* épaisseur de la barre */
+    width: 100%;
+    background: var(--sv-accent);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 220ms cubic-bezier(.2,.9,.2,1), opacity 220ms;
+    opacity: 0;
+    border-radius: 3px;
+}
+
+/* hover / focus / état actif */
+.nav-link:hover::after,
+.nav-link:focus::after,
+.nav-link.is-active::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+.sv-nav-with-indicator { position: relative; }
+
+/* l'indicateur qui se déplace */
+.sv-nav-with-indicator .nav-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, var(--sv-accent), var(--sv-accent-light));
+    border-radius: 3px;
+    transition: left 260ms cubic-bezier(.2,.9,.2,1), width 260ms cubic-bezier(.2,.9,.2,1);
+    pointer-events: none;
+    transform-origin: left center;
+}
+
+/* espace pour que l'indicateur ne chevauche pas le contenu */
+.sv-nav-with-indicator .navbar-item { padding-bottom: 0.75rem; }
+
+
+.sv-user-link {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 0.3rem 0.6rem !important;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.sv-user-link:hover {
+    background: #F9FAFB !important;
+    border-color: #D1D5DB;
+}
+
+/* Cache la flèche native de Bulma */
+/* supprime le chevron Bulma pour ce lien utilisateur */
+.sv-user-link::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* réduire/adapter l'espace à droite du lien */
+.sv-user-link {
+    padding-right: 0.5rem; /* ajuste selon besoin */
+}
+
+
+.sv-avatar {
+    width: 36px;               /* taille souhaitée */
+    height: 36px;
+    background: #2563EB;
+    color: #fff;
+    border-radius: 6px;
+    display: inline-flex;      /* inline pour ne pas forcer un bloc */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex: 0 0 auto;            /* empêche le shrink/grow */
+    line-height: 1;            /* évite décalage vertical */
+}
+
+
+.sv-username {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.sv-user-link .icon {
+    color: #9CA3AF;
+    font-size: 0.65rem;
+    margin-left: 2px;
+}
+
+/* --- Video Container --- */
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    background: #F3F4F6;
+    border-radius: 6px;
+}
+.video-container iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+}
+
+/* --- Camera Card --- */
+.camera-card {
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+.camera-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+    transform: translateY(-2px);
+}
+
+/* --- Live Dot --- */
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background: #10B981;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+}
+.stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--sodium-text);
+    line-height: 1;
+}
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--sodium-muted);
+    margin-top: 0.25rem;
+}
+
+/* --- Page Wrapper --- */
+.page-wrapper {
+    margin-left: 240px; /* Sidebar width */
+    padding-top: 80px;  /* Navbar height */
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+/* --- Page Header --- */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+/* --- Sidebar --- */
+aside.menu {
+    width: 240px;
+    position: fixed;
+    top: 64px; /* Navbar height */
+    bottom: 0;
+    background: #f5f5f5;
+    padding: 1.5rem;
+}
+
+/* assure la suppression du chevron Bulma (fallback si version Bulma différente) */
+.navbar-item.has-dropdown.is-arrowless .navbar-link::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* layout adaptatif : avatar + nom + icône */
+.sv-user-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;            /* espace adaptatif entre éléments */
+    padding-right: 0.25rem; /* réduit l'espace fixe à droite */
+    color: var(--sv-text);
+}
+
+/* avatar */
+.sv-avatar {
+    width: 40px;
+    height: 40px;
+    background: #2563EB;
+    color: #fff;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex: 0 0 auto;
+    line-height: 1;
+}
+
+.sv-avatar:hover {
+    background-color: #1f52c4;
+    width: 44px;
+    height: 44px;
+}
+
+
+/* nom (caché sur mobile) */
+.sv-username {
+    font-weight: 600;
+    color: var(--sv-text);
+    white-space: nowrap;
+}
+
+/* icône caret (plus discrète que fa-caret-down) */
+.sv-caret i {
+    font-size: 0.85rem;
+    color: var(--sv-text-muted);
+}
+
+/* si tu veux masquer complètement l'icône */
+.sv-user-link.no-caret .sv-caret { display: none !important; }
+
+/* accessibilité : focus visible */
+.sv-user-link:focus {
+    outline: 2px solid rgba(99,102,241,0.18);
+    outline-offset: 2px;
+}
+
+/* mobile : réduire gap et cacher le nom */
+@media (max-width: 768px) {
+    .sv-user-link { gap: 0.35rem; padding-right: 0.15rem; }
+    .sv-username { display: none !important; }
+}
+
+.navbar-item.sv-user-dropdown:hover {
+    background-color: transparent !important;
+}
+
+
