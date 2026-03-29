@@ -4,6 +4,8 @@ use App\Http\Controllers\CameraEventController;
 use App\Http\Controllers\CameraController;
 use App\Http\Controllers\CommandController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 
 Route::prefix('api')->group(function () {
     Route::post('/camera/event', [CameraEventController::class, 'handle']);
@@ -13,11 +15,10 @@ Route::prefix('api')->group(function () {
     Route::post('/camera/status', [CameraController::class, 'cameraStatus']);
 
     Route::get('/bridge/status', [CommandController::class, 'bridgeStatus']);
-});
 
-
-Route::post('/mediamtx/auth', function (Request $request) {
-    return response()->json(['ok' => true]);
+    Route::post('/mediamtx/auth', function (Request $request) {
+        return response()->json(['ok' => true]);
+    });
 });
 
 
