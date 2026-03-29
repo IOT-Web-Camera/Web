@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommandController;
 use App\Models\Camera;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
@@ -39,6 +40,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/{camera}', [CameraController::class, 'show'])->name('show');
         Route::delete('/{camera}', [CameraController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('dashboard/cameras/{name}/cmd')->name('cameras.cmd.')->group(function () {
+        Route::post('/led',    [CommandController::class, 'led'])->name('led');
+        Route::post('/move',   [CommandController::class, 'move'])->name('move');
+        Route::post('/reboot', [CommandController::class, 'reboot'])->name('reboot');
+    });
 });
 
 
@@ -49,7 +56,7 @@ Route::get('/stream/{name}', [CameraController::class, 'stream'])
 Route::post('/api/mediamtx/auth', [CameraController::class, 'mediamtxAuth']);
 Route::post('/api/camera/heartbeat', [CameraController::class, 'heartbeat']);
 Route::post('/api/camera/status', [CameraController::class, 'cameraStatus']);
-
+Route::get('/api/bridge/status', [CommandController::class, 'bridgeStatus']);
 
 // Auth routes (login/register)
 require __DIR__ . '/auth.php';

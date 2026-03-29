@@ -59,12 +59,24 @@ class CommandController extends Controller
     {
         try {
             $response = \Illuminate\Support\Facades\Http::timeout(3)
-                ->post('http://localhost:8766/cmd', $order);
+                ->post('http://51.210.11.74/cmd', $order);
 
             return $response->successful();
         } catch (\Exception $e) {
             \Log::error('Bridge injoignable', ['error' => $e->getMessage()]);
             return false;
+        }
+    }
+
+    public function bridgeStatus()
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(2)
+                ->get('http://localhost:8766/status');
+
+            return response()->json($response->json());
+        } catch (\Exception $e) {
+            return response()->json(['connected' => [], 'count' => 0], 200);
         }
     }
 
