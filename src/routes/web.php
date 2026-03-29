@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CameraController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,15 +22,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', function () {
-        $activeCameras = Camera::where('owner_id', Auth::id())
-            ->where('is_active', true)
-            ->get();
-
-        $totalUserCameras = Camera::where('owner_id', Auth::id())->count();
-
-        return view('pages.dashboard.index', compact('activeCameras', 'totalUserCameras'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profil utilisateur
     Route::prefix('profile')->name('profile.')->group(function () {
