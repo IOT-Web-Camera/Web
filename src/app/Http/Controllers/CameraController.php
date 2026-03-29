@@ -44,10 +44,11 @@ class CameraController extends Controller
     // Vue d'une caméra
     public function show(Camera $camera)
     {
-        // Vérifie que la caméra appartient à l'user connecté
         if ($camera->owner_id !== auth()->id()) {
             abort(403);
         }
+
+        $serverIp = config('app.mediamtx_host'); // ← ajoute ça
 
         $token = auth()->user()->createToken(
             'stream-' . $camera->name,
@@ -55,7 +56,7 @@ class CameraController extends Controller
             now()->addHour()
         )->plainTextToken;
 
-        return view('pages.cameras.show', compact('camera', 'token'));
+        return view('pages.cameras.show', compact('camera', 'token', 'serverIp'));
     }
 
     // Supprime une caméra
