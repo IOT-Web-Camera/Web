@@ -16,4 +16,8 @@ Route::prefix('api')->group(function () {
 });
 
 
+Route::post('/mediamtx/auth', function (Request $request) {
+    return response()->json(['ok' => true]);
+});
+
 
