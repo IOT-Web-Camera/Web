@@ -32,7 +32,14 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    // Caméras
+    // Routes commandes — doivent être placées AVANT les routes caméras
+    Route::prefix('dashboard/cameras/{name}/cmd')->name('cameras.cmd.')->group(function () {
+        Route::post('/led',    [CommandController::class, 'led'])->name('led');
+        Route::post('/move',   [CommandController::class, 'move'])->name('move');
+        Route::post('/reboot', [CommandController::class, 'reboot'])->name('reboot');
+    });
+
+// Caméras
     Route::prefix('cameras')->name('cameras.')->group(function () {
         Route::get('/', [CameraController::class, 'index'])->name('index');
         Route::get('/create', [CameraController::class, 'create'])->name('create');
@@ -41,11 +48,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{camera}', [CameraController::class, 'destroy'])->name('destroy');
     });
 
-    Route::prefix('dashboard/cameras/{name}/cmd')->name('cameras.cmd.')->group(function () {
-        Route::post('/led',    [CommandController::class, 'led'])->name('led');
-        Route::post('/move',   [CommandController::class, 'move'])->name('move');
-        Route::post('/reboot', [CommandController::class, 'reboot'])->name('reboot');
-    });
 });
 
 
