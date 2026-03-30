@@ -56,7 +56,7 @@
             background-color: #f5f5f5;
             padding: 2rem 1rem;
             overflow-y: auto;
-            z-index: 20; /* au-dessus du contenu principal */
+            z-index: 100; /* au-dessus du contenu principal */
         }
 
         .sidebar .menu-label {

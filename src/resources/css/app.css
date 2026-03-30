@@ -798,3 +798,22 @@ aside.menu {
 }
 
 
+.tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.tabs ul {
+    flex-wrap: nowrap !important;
+    display: flex;
+}
+
+.tabs li {
+    flex-shrink: 0;
+}
+
+main {
+    margin-left: 240px;
+}
+

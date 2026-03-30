@@ -1,65 +1,91 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container is-fluid" style="margin-left:260px; padding-top:2rem;">
+    <div class="events-content">
 
-        <h1 class="title is-3">
-            <i class="fa-solid fa-chart-line"></i>
-            &nbsp;Événements & Statistiques
-        </h1>
-
-        <!-- Sélecteur de caméras -->
-        <div class="buttons mb-5">
-            @foreach($cameras as $camera)
-                <button class="button camera-tab"
-                        data-target="camera-{{ $camera->id }}">
-                    <i class="fa-solid fa-video"></i>
-                    &nbsp;{{ $camera->label }}
-                </button>
-            @endforeach
+        <div class="page-header mb-5">
+            <h1 class="title is-3">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                &nbsp;Événements & Statistiques
+            </h1>
+            <p class="subtitle">Historique des données remontées par vos caméras</p>
         </div>
 
-        @foreach($cameras as $camera)
-            <div id="camera-{{ $camera->id }}" class="camera-panel" style="display:none;">
-                <div class="box mb-6">
-                    <h2 class="title is-4">
-                        <i class="fa-solid fa-video"></i>
-                        &nbsp;{{ $camera->label }} ({{ $camera->name }})
-                    </h2>
+        @if($cameras->isEmpty())
+            <div class="box has-text-centered" style="padding: 3rem;">
+                <i class="fa-solid fa-video-slash fa-2x mb-3" style="color: var(--sv-text-muted);"></i>
+                <p style="font-weight: 500;">Aucune caméra disponible</p>
+            </div>
+        @else
+            {{-- Onglets caméras --}}
+            <div class="tabs mb-0" style="overflow-x: auto; overflow-y: hidden; flex-wrap: nowrap; -webkit-overflow-scrolling: touch;">
+                <ul style="flex-wrap: nowrap; min-width: max-content;">
+                    @foreach($cameras as $i => $camera)
+                        <li class="camera-tab {{ $i === 0 ? 'is-active' : '' }}"
+                            data-target="camera-{{ $camera->id }}">
+                            <a style="white-space: nowrap;">
+                                <span class="icon"><i class="fa-solid fa-video"></i></span>
+                                <span>{{ $camera->label }}</span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
 
-                    <!-- Boutons de plage -->
-                    <div class="buttons is-right mb-3">
-                        <button class="button is-small range-btn" data-range="1h">1h</button>
-                        <button class="button is-small range-btn" data-range="6h">6h</button>
-                        <button class="button is-small range-btn" data-range="24h">24h</button>
-                        <button class="button is-small range-btn" data-range="7d">7j</button>
-                        <button class="button is-small range-btn is-primary" data-range="all">Tout</button>
+            {{-- Panels --}}
+            @foreach($cameras as $i => $camera)
+                <div id="camera-{{ $camera->id }}"
+                     class="camera-panel box"
+                     style="{{ $i !== 0 ? 'display:none;' : '' }} border-radius: 0 8px 8px 8px;">
+
+                    {{-- Boutons de plage --}}
+                    <div class="is-flex is-justify-content-flex-end mb-4" style="gap: 0.5rem; flex-wrap: wrap;">
+                        @foreach(['1h' => '1h', '6h' => '6h', '24h' => '24h', '7d' => '7j', 'all' => 'Tout'] as $val => $label)
+                            <button class="button is-small range-btn {{ $val === 'all' ? 'is-primary' : '' }}"
+                                    data-range="{{ $val }}"
+                                    data-cam="{{ $camera->id }}">
+                                {{ $label }}
+                            </button>
+                        @endforeach
                     </div>
 
-                    <!-- Graphiques -->
-                    <div id="chart-temp-{{ $camera->id }}" style="height: 250px;"></div>
-                    <div id="chart-battery-{{ $camera->id }}" style="height: 250px;" class="mt-5"></div>
-                    <div id="chart-signal-{{ $camera->id }}" style="height: 250px;" class="mt-5"></div>
+                    {{-- Graphiques responsive --}}
+                    <div class="chart-wrapper mb-4">
+                        <div id="chart-temp-{{ $camera->id }}" style="height: 220px;"></div>
+                    </div>
+                    <div class="chart-wrapper mb-4">
+                        <div id="chart-battery-{{ $camera->id }}" style="height: 220px;"></div>
+                    </div>
+                    <div class="chart-wrapper mb-5">
+                        <div id="chart-signal-{{ $camera->id }}" style="height: 220px;"></div>
+                    </div>
 
-                    <!-- Timeline -->
-                    <h3 class="title is-5 mt-5">Timeline des événements</h3>
+                    {{-- Timeline --}}
+                    <h3 class="title is-6 mb-3" style="color: var(--sv-text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                        Timeline des événements
+                    </h3>
 
-                    <div class="timeline-box"
-                         style="max-height: 250px; overflow-y: auto; padding-right: 10px; border: 1px solid #ddd; border-radius: 6px;">
-                        <ul>
-                            @foreach($camera->events as $event)
-                                <li style="margin-bottom: 4px;">
-                                    <strong>{{ $event->created_at->format('H:i:s') }}</strong>
-                                    — {{ $event->type }}
-                                    — <code>{{ json_encode($event->payload) }}</code>
-                                </li>
-                            @endforeach
-                        </ul>
+                    <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--sv-border); border-radius: 8px;">
+                        @forelse($camera->events as $event)
+                            <div style="display: flex; gap: 1rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--sv-border); font-size: 0.8rem; align-items: center;">
+                                <span style="color: var(--sv-text-muted); white-space: nowrap; font-family: monospace;">
+                                    {{ $event->created_at->format('H:i:s') }}
+                                </span>
+                                <span class="tag is-info" style="flex-shrink: 0;">{{ $event->type }}</span>
+                                <code style="font-size: 0.75rem; color: var(--sv-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ json_encode($event->payload) }}
+                                </code>
+                            </div>
+                        @empty
+                            <div style="padding: 2rem; text-align: center; color: var(--sv-text-muted); font-size: 0.875rem;">
+                                Aucun événement enregistré
+                            </div>
+                        @endforelse
                     </div>
 
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        @endif
 
     </div>
 @endsection
@@ -187,6 +213,15 @@
             @foreach($cameras as $camera)
             renderChartsForCamera({{ $camera->id }}, @json($camera->events));
             @endforeach
+
+            document.querySelectorAll('.camera-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.camera-tab').forEach(t => t.classList.remove('is-active'));
+                    document.querySelectorAll('.camera-panel').forEach(p => p.style.display = 'none');
+                    tab.classList.add('is-active');
+                    document.getElementById(tab.dataset.target).style.display = 'block';
+                });
+            });
 
         });
     </script>
