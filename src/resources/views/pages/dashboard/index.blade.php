@@ -64,17 +64,11 @@
                         </div>
 
                         {{-- Vidéo --}}
-                        <div class="video-container" style="border-radius: 0; position: relative;">
-                            <video
-                                id="cam-{{ $cam->name }}"
-                                src="http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}/index.m3u8"
-                                autoplay playsinline muted controls
-                                style="width:100%; height:100%; background:black;">
-                            </video>
-                            <canvas id="freeze-{{ $cam->name }}"
-                                    style="width:100%; height:100%; display:none; position:absolute; top:0; left:0;">
-                            </canvas>
+                        <div class="video-container" style="position:relative;">
+                            <video id="cam-{{ $cam->name }}" autoplay muted playsinline style="width:100%; height:100%; background:black;"></video>
+                            <canvas id="freeze-{{ $cam->name }}" style="position:absolute; top:0; left:0; width:100%; height:100%; display:none;"></canvas>
                         </div>
+
 
                         {{-- Footer carte --}}
                         <div style="padding: 0.75rem 1rem;">
@@ -93,43 +87,41 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
-        @foreach($activeCameras as $cam)
-        (function() {
-            const videoEl = document.getElementById("cam-{{ $cam->name }}");
-            const canvas  = document.getElementById("freeze-{{ $cam->name }}");
-            const ctx     = canvas.getContext('2d');
-            let lastFrameCaptured = false;
+        const video = document.getElementById("cam-{{ $cam->name }}");
+        const canvas = document.getElementById("freeze-{{ $cam->name }}");
+        const ctx = canvas.getContext('2d');
+        let lastFrame = false;
 
-            // Capture la dernière frame
-            function captureLastFrame() {
-                if(videoEl.readyState >= 2 && videoEl.videoWidth > 0) {
-                    canvas.width  = videoEl.videoWidth;
-                    canvas.height = videoEl.videoHeight;
-                    ctx.drawImage(videoEl, 0, 0);
-                    lastFrameCaptured = true;
+        if(Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource("http://{{ $serverIp }}:8889/{{ $cam->name }}/index.m3u8");
+            hls.attachMedia(video);
+
+            video.addEventListener('play', () => {
+                // Capture initiale
+                canvas.width  = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                lastFrame = true;
+            });
+
+            video.addEventListener('timeupdate', () => {
+                if(!video.paused && !video.ended) {
+                    canvas.width  = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    ctx.drawImage(video, 0, 0);
+                    lastFrame = true;
                 }
-            }
+            });
 
-            // Vérifie toutes les 1s si le flux est actif
-            setInterval(() => {
-                if(videoEl.readyState === 0 || videoEl.paused || videoEl.ended) {
-                    // Flux perdu → afficher dernière frame
-                    if(lastFrameCaptured) {
-                        videoEl.style.display = 'none';
-                        canvas.style.display  = 'block';
-                    }
-                } else {
-                    // Flux actif → afficher vidéo
-                    videoEl.style.display = 'block';
-                    canvas.style.display  = 'none';
-                    captureLastFrame();
+            video.addEventListener('error', () => {
+                if(lastFrame) {
+                    video.style.display = 'none';
+                    canvas.style.display = 'block';
                 }
-            }, 1000);
-
-            // Capture initiale
-            videoEl.addEventListener('play', captureLastFrame);
-        })();
-        @endforeach
+            });
+        }
     </script>
 @endpush
