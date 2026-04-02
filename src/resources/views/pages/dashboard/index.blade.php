@@ -48,56 +48,70 @@
         </div>
 
         {{-- Flux vidéo --}}
-        @if(empty($activeCameras))
-            <div class="box has-text-centered" style="padding: 4rem 2rem;">
-                <span class="icon is-large mb-4" style="color: var(--sodium-muted);">
-                    <i class="fas fa-video-slash fa-2x"></i>
-                </span>
-                <p style="font-size: 1rem; font-weight: 500; margin-bottom: 0.5rem;">Aucun flux actif</p>
-                <p style="font-size: 0.875rem; color: var(--sodium-muted);">
-                    Vérifiez que vos Raspberry Pi diffusent vers <code>{{ $serverIp }}</code>
-                </p>
-            </div>
-        @else
-            <div class="columns is-multiline">
-                @foreach($activeCameras as $cam)
-                    <div class="column is-4">
-                        <div class="box camera-card p-0" style="overflow: hidden;">
-                            {{-- Header carte --}}
-                            <div class="is-flex is-justify-content-space-between is-align-items-center" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
-                                <span style="font-weight: 500; font-size: 0.875rem;">
-                                    <span class="live-dot animate-pulse"></span>
-                                    {{ $cam->label }}
-                                </span>
-                                <span class="tag is-info">
-                                    <span class="mono">{{ $cam->name }}</span>
-                                </span>
-                            </div>
-                            {{-- Vidéo --}}
-                            <div class="video-container" style="border-radius: 0;">
-                                <iframe
-                                    src="http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}?user={{ auth()->user()->username }}&password={{ $streamToken }}"
-                                    allowfullscreen>
-                                </iframe>
-                            </div>
-                            {{-- Footer carte --}}
-                            <div style="padding: 0.75rem 1rem;">
-                                <a href="{{ route('cameras.show', $cam->name) }}" class="button is-light is-small is-fullwidth">
-                                    <span class="icon"><i class="fas fa-sliders"></i></span>
-                                    <span>Contrôler</span>
-                                </a>
-                            </div>
+        <div class="columns is-multiline">
+            @foreach($activeCameras as $cam)
+                <div class="column is-4">
+                    <div class="box camera-card p-0" style="overflow: hidden;">
+                        {{-- Header carte --}}
+                        <div class="is-flex is-justify-content-space-between is-align-items-center" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
+            <span style="font-weight: 500; font-size: 0.875rem;">
+                <span class="live-dot animate-pulse"></span>
+                {{ $cam->label }}
+            </span>
+                            <span class="tag is-info">
+                <span class="mono">{{ $cam->name }}</span>
+            </span>
+                        </div>
+                        {{-- Vidéo --}}
+                        <div class="video-container" style="border-radius: 0;">
+                            <video id="cam-{{ $cam->name }}" autoplay playsinline muted style="width:100%; height:100%; background:black;"></video>
+                        </div>
+                        {{-- Footer carte --}}
+                        <div style="padding: 0.75rem 1rem;">
+                            <a href="{{ route('cameras.show', $cam->name) }}" class="button is-light is-small is-fullwidth">
+                                <span class="icon"><i class="fas fa-sliders"></i></span>
+                                <span>Contrôler</span>
+                            </a>
                         </div>
                     </div>
+                </div>
+            @endforeach
+        </div>
+
+        @push('scripts')
+            <script>
+                @foreach($activeCameras as $cam)
+                (async () => {
+                    const videoEl = document.getElementById("cam-{{ $cam->name }}");
+                    const pc = new RTCPeerConnection();
+
+                    pc.ontrack = event => {
+                        if (!videoEl.srcObject) {
+                            videoEl.srcObject = event.streams[0];
+                        }
+                    };
+
+                    pc.onconnectionstatechange = () => {
+                        if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
+                            console.warn("Flux WebRTC {{ $cam->name }} perdu, freeze sur la dernière image");
+                        }
+                    };
+
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    const resp = await fetch(`http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}/`, {
+                        method: "POST",
+                        body: offer.sdp,
+                        headers: { "Content-Type": "application/sdp" }
+                    });
+
+                    const answerSDP = await resp.text();
+                    await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
+                })();
                 @endforeach
-            </div>
-        @endif
 
-    </div>
-@endsection
-
-@push('scripts')
-    <script>
-        setTimeout(() => location.reload(), 60000);
-    </script>
-@endpush
+                // Reload automatique toutes les 60 secondes (optionnel)
+                setTimeout(() => location.reload(), 60000);
+            </script>
+    @endpush

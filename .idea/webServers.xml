@@ -5,7 +5,7 @@
       <webServer id="ce653a9f-ea12-48e6-b15d-cdcb35ec8c11" name="OVH">
         <fileTransfer accessType="SFTP" host="51.210.11.74" port="2222" sshConfigId="a2824487-fb7a-400d-b62b-04b9aa0da060" sshConfig="ubuntu@51.210.11.74:2222 password">
           <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
         </fileTransfer>
       </webServer>
