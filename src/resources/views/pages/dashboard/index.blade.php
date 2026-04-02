@@ -101,26 +101,17 @@
 @push('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
-            function refreshCameraGrid() {
-                fetch(window.location.href, { cache: "no-store" })
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, "text/html");
-
-                        const newGrid = doc.querySelector("#camera-grid");
-                        const currentGrid = document.querySelector("#camera-grid");
-
-                        if (newGrid && currentGrid) {
-                            currentGrid.innerHTML = newGrid.innerHTML;
-                        }
-                    })
-                    .catch(err => console.error("Erreur refresh caméras :", err));
+            async function checkActiveCameras() {
+                try {
+                    const res  = await fetch('/api/bridge/status');
+                    const data = await res.json();
+                    // Juste met à jour le compteur, ne touche pas aux iframes
+                    const count = document.querySelector('.stat-number');
+                    if (count) count.textContent = data.count ?? '—';
+                } catch(e) {}
             }
 
-            // Rafraîchit toutes les 10 secondes
-            setInterval(refreshCameraGrid, 10000);
+            setInterval(checkActiveCameras, 10000);
         });
     </script>
 @endpush
