@@ -50,118 +50,77 @@
         </div>
 
         {{-- Flux vidéo --}}
-        <div class="columns is-multiline">
-            @foreach($activeCameras as $cam)
-                <div class="column is-4">
-                    <div class="box camera-card p-0" style="overflow: hidden;">
-                        {{-- Header carte --}}
-                        <div class="is-flex is-justify-content-space-between is-align-items-center"
-                             style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
-                    <span style="font-weight: 500; font-size: 0.875rem;">
-                        <span class="live-dot animate-pulse"></span>
-                        {{ $cam->label }}
-                    </span>
-                            <span class="tag is-info">
-                        <span class="mono">{{ $cam->name }}</span>
-                    </span>
-                        </div>
+        <div id="camera-grid">
+            <div class="columns is-multiline">
+                @foreach($activeCameras as $cam)
+                    <div class="column is-4">
+                        <div class="box camera-card p-0" style="overflow: hidden;">
 
-                        {{-- Vidéo --}}
-                        <div class="video-container">
-                            <video
-                                class="cam-video"
-                                autoplay
-                                muted
-                                playsinline
-                                style="width:100%; height:100%;"
-                                data-stream-url="http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8"
-                            ></video>
-                            <canvas class="cam-freeze"></canvas>
-                        </div>
+                            {{-- Header --}}
+                            <div class="is-flex is-justify-content-space-between is-align-items-center"
+                                 style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
+                        <span style="font-weight: 500; font-size: 0.875rem;">
+                            <span class="live-dot animate-pulse"></span>
+                            {{ $cam->label }}
+                        </span>
+                                <span class="tag is-info">
+                            <span class="mono">{{ $cam->name }}</span>
+                        </span>
+                            </div>
 
-                        {{-- Footer carte --}}
-                        <div style="padding: 0.75rem 1rem;">
-                            <a href="{{ route('cameras.show', $cam->name) }}" class="button is-light is-small is-fullwidth">
-                                <span class="icon"><i class="fas fa-sliders"></i></span>
-                                <span>Contrôler</span>
-                            </a>
+                            {{-- Iframe vidéo --}}
+                            <div style="width: 100%; height: 250px; background: black;">
+                                <iframe
+                                    src="http://{{ $serverIp }}:8889/{{ $cam->name }}/"
+                                    style="width: 100%; height: 100%; border: 0;"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+
+                            {{-- Footer --}}
+                            <div style="padding: 0.75rem 1rem;">
+                                <a href="{{ route('cameras.show', $cam->name) }}"
+                                   class="button is-light is-small is-fullwidth">
+                                    <span class="icon"><i class="fas fa-sliders"></i></span>
+                                    <span>Contrôler</span>
+                                </a>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
+
+
 
 
     </div>
 @endsection
 
 @push('scripts')
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const videos = document.querySelectorAll('.cam-video');
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
 
-                videos.forEach(video => {
-                    const url = video.dataset.streamUrl;
-                    const canvas = video.parentElement.querySelector('.cam-freeze');
-                    const ctx = canvas.getContext('2d');
-                    let lastFrameCaptured = false;
+            function refreshCameraGrid() {
+                fetch(window.location.href, { cache: "no-store" })
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, "text/html");
 
-                    function captureFrame() {
-                        if (video.videoWidth > 0 && video.videoHeight > 0) {
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            lastFrameCaptured = true;
+                        const newGrid = doc.querySelector("#camera-grid");
+                        const currentGrid = document.querySelector("#camera-grid");
+
+                        if (newGrid && currentGrid) {
+                            currentGrid.innerHTML = newGrid.innerHTML;
                         }
-                    }
+                    })
+                    .catch(err => console.error("Erreur refresh caméras :", err));
+            }
 
-                    function showLastFrame() {
-                        if (lastFrameCaptured) {
-                            video.style.display = 'none';
-                            canvas.style.display = 'block';
-                        }
-                    }
-
-                    function showVideo() {
-                        canvas.style.display = 'none';
-                        video.style.display = 'block';
-                    }
-
-                    function initHls() {
-                        if (Hls.isSupported()) {
-                            const hls = new Hls();
-                            hls.loadSource(url);
-                            hls.attachMedia(video);
-
-                            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                                video.play().catch(() => {});
-                            });
-
-                            hls.on(Hls.Events.ERROR, (event, data) => {
-                                console.warn("HLS error:", data);
-                                showLastFrame();
-                            });
-                        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                            video.src = url;
-                        }
-                    }
-
-                    // Capture périodique
-                    setInterval(() => {
-                        if (!video.paused && !video.ended && video.readyState >= 2) {
-                            showVideo();
-                            captureFrame();
-                        } else {
-                            showLastFrame();
-                        }
-                    }, 500);
-
-                    video.addEventListener('play', captureFrame);
-                    initHls();
-                });
-            });
-        </script>
-    @endpush
+            // Rafraîchit toutes les 10 secondes
+            setInterval(refreshCameraGrid, 10000);
+        });
+    </script>
 @endpush
