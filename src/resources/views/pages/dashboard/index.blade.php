@@ -57,19 +57,26 @@
                         {{-- Header carte --}}
                         <div class="is-flex is-justify-content-space-between is-align-items-center"
                              style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
-                        <span style="font-weight: 500; font-size: 0.875rem;">
-                            <span class="live-dot animate-pulse"></span>
-                            {{ $cam->label }}
-                        </span>
+                    <span style="font-weight: 500; font-size: 0.875rem;">
+                        <span class="live-dot animate-pulse"></span>
+                        {{ $cam->label }}
+                    </span>
                             <span class="tag is-info">
-                            <span class="mono">{{ $cam->name }}</span>
-                        </span>
+                        <span class="mono">{{ $cam->name }}</span>
+                    </span>
                         </div>
 
                         {{-- Vidéo --}}
                         <div class="video-container">
-                            <video id="cam-{{ $cam->name }}" autoplay muted playsinline style="width:100%; height:100%;"></video>
-                            <canvas id="freeze-{{ $cam->name }}"></canvas>
+                            <video
+                                class="cam-video"
+                                autoplay
+                                muted
+                                playsinline
+                                style="width:100%; height:100%;"
+                                data-stream-url="http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8"
+                            ></video>
+                            <canvas class="cam-freeze"></canvas>
                         </div>
 
                         {{-- Footer carte --}}
@@ -84,74 +91,77 @@
             @endforeach
         </div>
 
+
     </div>
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            @foreach($activeCameras as $cam)
-            (function() {
-                const video = document.getElementById("cam-{{ $cam->name }}");
-                const canvas = document.getElementById("freeze-{{ $cam->name }}");
-                const ctx = canvas.getContext('2d');
-                let lastFrameCaptured = false;
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const videos = document.querySelectorAll('.cam-video');
 
-                function captureFrame() {
-                    if(video.videoWidth > 0 && video.videoHeight > 0) {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        lastFrameCaptured = true;
+                videos.forEach(video => {
+                    const url = video.dataset.streamUrl;
+                    const canvas = video.parentElement.querySelector('.cam-freeze');
+                    const ctx = canvas.getContext('2d');
+                    let lastFrameCaptured = false;
+
+                    function captureFrame() {
+                        if (video.videoWidth > 0 && video.videoHeight > 0) {
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            lastFrameCaptured = true;
+                        }
                     }
-                }
 
-                function showLastFrame() {
-                    if(lastFrameCaptured) {
-                        video.style.display = 'none';
-                        canvas.style.display = 'block';
+                    function showLastFrame() {
+                        if (lastFrameCaptured) {
+                            video.style.display = 'none';
+                            canvas.style.display = 'block';
+                        }
                     }
-                }
 
-                function showVideo() {
-                    canvas.style.display = 'none';
-                    video.style.display = 'block';
-                }
+                    function showVideo() {
+                        canvas.style.display = 'none';
+                        video.style.display = 'block';
+                    }
 
-                function initHls() {
-                    if(Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource("http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8");
-                        hls.attachMedia(video);
+                    function initHls() {
+                        if (Hls.isSupported()) {
+                            const hls = new Hls();
+                            hls.loadSource(url);
+                            hls.attachMedia(video);
 
-                        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                            video.play().catch(()=>{});
-                        });
+                            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                                video.play().catch(() => {});
+                            });
 
-                        hls.on(Hls.Events.ERROR, (event, data) => {
-                            console.warn("HLS error for {{ $cam->name }}:", data);
+                            hls.on(Hls.Events.ERROR, (event, data) => {
+                                console.warn("HLS error:", data);
+                                showLastFrame();
+                            });
+                        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                            video.src = url;
+                        }
+                    }
+
+                    // Capture périodique
+                    setInterval(() => {
+                        if (!video.paused && !video.ended && video.readyState >= 2) {
+                            showVideo();
+                            captureFrame();
+                        } else {
                             showLastFrame();
-                        });
-                    } else if(video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = "http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8";
-                    }
-                }
+                        }
+                    }, 500);
 
-                // Capture régulière toutes les 500ms
-                setInterval(() => {
-                    if(!video.paused && !video.ended && video.readyState >= 2) {
-                        showVideo();
-                        captureFrame();
-                    } else {
-                        showLastFrame();
-                    }
-                }, 500);
-
-                video.addEventListener('play', captureFrame);
-                initHls();
-            })();
-            @endforeach
-        });
-    </script>
+                    video.addEventListener('play', captureFrame);
+                    initHls();
+                });
+            });
+        </script>
+    @endpush
 @endpush
