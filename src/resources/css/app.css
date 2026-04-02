@@ -817,3 +817,22 @@ main {
     margin-left: 240px;
 }
 
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        padding: 1rem !important;
+    }
+}
+
+
+@media (prefers-color-scheme: dark) {
+    html, body {
+        background-color: #fff !important;
+        color: #363636 !important;
+    }
+    .box, .navbar, .sidebar, .card {
+        background-color: #fff !important;
+        color: #363636 !important;
+    }
+}

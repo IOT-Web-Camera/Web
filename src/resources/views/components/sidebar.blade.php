@@ -50,34 +50,31 @@
         .sidebar {
             width: 240px;
             position: fixed;
-            top: 3.25rem; /* hauteur navbar */
+            top: 3.25rem;
             bottom: 0;
             left: 0;
             background-color: #f5f5f5;
             padding: 2rem 1rem;
             overflow-y: auto;
-            z-index: 100; /* au-dessus du contenu principal */
+            z-index: 100;
+            transition: transform 0.3s ease;
         }
 
-        .sidebar .menu-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #4a4a4a;
-            margin-top: 1.5rem;
-        }
-
-        .sidebar .menu-list li a {
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            color: #363636;
-            display: block;
-            transition: background 0.2s;
-        }
-
-        .sidebar .menu-list li a:hover,
-        .sidebar .menu-list li a.is-active {
-            background-color: #10b981;
-            color: white;
+        /* Cacher sur mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.is-open {
+                transform: translateX(0);
+                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+            .sidebar-overlay {
+                display: block;
+            }
         }
     </style>
 @endpush

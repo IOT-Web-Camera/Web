@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
+
+
 @section('content')
-    <div class="container is-fluid" style="margin-left:260px; padding-top:2rem;">
+    <div class="container is-fluid" style="padding: 1.5rem 1rem;">
 
         <h1 class="title is-3">
             <span class="icon"><i class="fa-solid fa-user"></i></span>

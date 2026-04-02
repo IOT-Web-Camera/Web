@@ -215,10 +215,10 @@
                     <p class="control-group-label" style="margin-bottom: 1.25rem;">
                         <i class="fas fa-microchip" style="margin-right: 4px;"></i> Télémetrie
                     </p>
-
-                    <div id="telemetry-box" class="mono" style=" font-size: 0.85rem; color: var(--sodium-muted); line-height: 1.4;">
-                        <em>Aucune donnée reçue...</em>
+                    <div id="telemetry-box" style="font-size: 0.85rem; line-height: 1.8;">
+                        <em style="color: var(--sodium-muted);">Aucune donnée reçue...</em>
                     </div>
+                    <p id="telemetry-time" style="font-size: 0.7rem; color: var(--sodium-muted); margin-top: 0.75rem;"></p>
                 </div>
             </div>
         </div>
@@ -314,30 +314,43 @@
         function updateCameraUI(events) {
             if (!events.length) return;
 
-            const last = events[0]; // dernier événement
-            const box = document.getElementById("telemetry-box");
+            const telemetryEvents = events.filter(e => e.type === 'telemetry');
+            if (!telemetryEvents.length) return;
 
-            // --- Télémetrie ---
-            if (last.type === "telemetry") {
-                const t = last.payload;
+            const last    = telemetryEvents[0];
+            const payload = last.payload;
+            const box     = document.getElementById('telemetry-box');
 
-                box.innerHTML = `
-                <div><b>Température :</b> ${t.temperature}°C</div>
-                <div><b>Batterie :</b> ${t.battery}%</div>
-                <div><b>Signal :</b> ${t.signal} dBm</div>
-                <div><b>Uptime :</b> ${Math.round(t.uptime)}s</div>
-            `;
-            }
+            box.innerHTML = Object.entries(payload).map(([key, val]) => {
+                // Formatage de la valeur selon son type
+                let display;
+                if (typeof val === 'boolean') {
+                    display = val
+                        ? '<span style="color:#10b981;">✅ Oui</span>'
+                        : '<span style="color:#ef4444;">❌ Non</span>';
+                } else if (typeof val === 'number') {
+                    display = `<strong>${val}</strong>`;
+                } else {
+                    display = `<strong>${val}</strong>`;
+                }
 
-            // --- ACK LED ---
-            if (last.type === "LED_ACK") {
-                showToast("LED confirmée par la caméra");
-            }
+                // Label lisible : snake_case → "Snake Case"
+                const label = key
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, c => c.toUpperCase());
 
-            // --- ACK MOVE ---
-            if (last.type === "MOVE_ACK") {
-                showToast("Mouvement exécuté");
-            }
+                return `
+            <div style="display:flex; justify-content:space-between; align-items:center;
+                        padding: 0.4rem 0; border-bottom: 1px solid var(--sodium-border);">
+                <span style="color: var(--sodium-muted); font-size:0.85rem;">${label}</span>
+                <span style="font-size:0.85rem;">${display}</span>
+            </div>`;
+            }).join('');
+
+            // Horodatage
+            const time = new Date(last.created_at);
+            document.getElementById('telemetry-time').textContent =
+                `Mise à jour : ${time.toLocaleTimeString('fr-FR')}`;
         }
 
     </script>

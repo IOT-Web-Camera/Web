@@ -9,20 +9,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.svg') }}">
 
+    <meta name="color-scheme" content="light only">
+    <style>
+        :root { color-scheme: light only; }
+
+        /* Forcer Bulma en light même si prefers-color-scheme: dark */
+        html {
+            background-color: #fff !important;
+            color: #363636 !important;
+        }
+    </style>
+
     <!-- Ton CSS global -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
 </head>
-<body style="min-height: 100vh">
+
+
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
 
 @auth
-    <aside class="sidebar">
-        @include('components.sidebar')
-    </aside>
+    {{-- Overlay mobile --}}
+    <div class="sidebar-overlay" onclick="toggleSidebar()"
+         style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;"></div>
+
+    {{-- Sidebar --}}
+    @include('components.sidebar')
 @endauth
 
-<main class="main-content" style="flex: 1; min-height: 100vh; padding: 2rem;">
+<main class="main-content" style="flex:1; min-height:100vh; padding:2rem; margin-left:240px;">
     @include('components.navbar')
 
     <section class="section">
@@ -34,9 +50,19 @@
 
 @include('components.footer')
 
-
 @stack('scripts')
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        const isOpen  = sidebar.classList.toggle('is-open');
+        overlay.style.display = isOpen ? 'block' : 'none';
+    }
+</script>
+
 </body>
 
 
 </html>
+
