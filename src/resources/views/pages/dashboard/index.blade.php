@@ -54,24 +54,28 @@
                     <div class="box camera-card p-0" style="overflow: hidden;">
                         {{-- Header carte --}}
                         <div class="is-flex is-justify-content-space-between is-align-items-center" style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--sodium-border);">
-            <span style="font-weight: 500; font-size: 0.875rem;">
-                <span class="live-dot animate-pulse"></span>
-                {{ $cam->label }}
-            </span>
+                        <span style="font-weight: 500; font-size: 0.875rem;">
+                            <span class="live-dot animate-pulse"></span>
+                            {{ $cam->label }}
+                        </span>
                             <span class="tag is-info">
-                <span class="mono">{{ $cam->name }}</span>
-            </span>
+                            <span class="mono">{{ $cam->name }}</span>
+                        </span>
                         </div>
+
                         {{-- Vidéo --}}
                         <div class="video-container" style="border-radius: 0; position: relative;">
-                            <video id="cam-{{ $cam->name }}"
-                                   autoplay playsinline muted
-                                   style="width:100%; height:100%; background:black; display:block;">
+                            <video
+                                id="cam-{{ $cam->name }}"
+                                src="http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}/index.m3u8"
+                                autoplay playsinline muted controls
+                                style="width:100%; height:100%; background:black;">
                             </video>
                             <canvas id="freeze-{{ $cam->name }}"
                                     style="width:100%; height:100%; display:none; position:absolute; top:0; left:0;">
                             </canvas>
                         </div>
+
                         {{-- Footer carte --}}
                         <div style="padding: 0.75rem 1rem;">
                             <a href="{{ route('cameras.show', $cam->name) }}" class="button is-light is-small is-fullwidth">
@@ -84,86 +88,48 @@
             @endforeach
         </div>
 
+    </div>
+
+@endsection
+
 @push('scripts')
     <script>
         @foreach($activeCameras as $cam)
-        (async () => {
-            const videoEl   = document.getElementById("cam-{{ $cam->name }}");
-            const canvas    = document.getElementById("freeze-{{ $cam->name }}");
-            const ctx       = canvas.getContext('2d');
-            let   lastFrame = false;
+        (function() {
+            const videoEl = document.getElementById("cam-{{ $cam->name }}");
+            const canvas  = document.getElementById("freeze-{{ $cam->name }}");
+            const ctx     = canvas.getContext('2d');
+            let lastFrameCaptured = false;
 
-            // Capture la dernière frame visible dans le canvas
+            // Capture la dernière frame
             function captureLastFrame() {
-                if (videoEl.readyState >= 2 && videoEl.videoWidth > 0) {
+                if(videoEl.readyState >= 2 && videoEl.videoWidth > 0) {
                     canvas.width  = videoEl.videoWidth;
                     canvas.height = videoEl.videoHeight;
                     ctx.drawImage(videoEl, 0, 0);
-                    lastFrame = true;
+                    lastFrameCaptured = true;
                 }
             }
 
-            // Capture toutes les 500ms
-            setInterval(captureLastFrame, 500);
-
-            async function connect() {
-                const pc = new RTCPeerConnection({
-                    iceServers: [],
-                    iceTransportPolicy: 'all',
-                    bundlePolicy: 'max-bundle',
-                });
-
-                pc.ontrack = event => {
-                    videoEl.srcObject = event.streams[0];
-                    // Montre la vidéo, cache le canvas
-                    videoEl.style.display = 'block';
-                    canvas.style.display  = 'none';
-                };
-
-                pc.onconnectionstatechange = () => {
-                    const state = pc.connectionState;
-                    console.log("WebRTC {{ $cam->name }} →", state);
-
-                    if (state === 'failed' || state === 'disconnected') {
-                        // Affiche la dernière frame gelée
-                        if (lastFrame) {
-                            videoEl.style.display = 'none';
-                            canvas.style.display  = 'block';
-                        }
-                        // Reconnexion dans 3s
-                        setTimeout(connect, 3000);
-                    }
-                };
-
-                try {
-                    const offer = await pc.createOffer();
-                    await pc.setLocalDescription(offer);
-
-                    const resp = await fetch(
-                        `http://{{ config('app.mediamtx_host') }}:8889/{{ $cam->name }}/`,
-                        {
-                            method: 'POST',
-                            body: offer.sdp,
-                            headers: { 'Content-Type': 'application/sdp' }
-                        }
-                    );
-
-                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-                    const answerSDP = await resp.text();
-                    await pc.setRemoteDescription({ type: 'answer', sdp: answerSDP });
-
-                } catch (e) {
-                    console.warn("Connexion {{ $cam->name }} échouée, retry dans 3s...", e);
-                    if (lastFrame) {
+            // Vérifie toutes les 1s si le flux est actif
+            setInterval(() => {
+                if(videoEl.readyState === 0 || videoEl.paused || videoEl.ended) {
+                    // Flux perdu → afficher dernière frame
+                    if(lastFrameCaptured) {
                         videoEl.style.display = 'none';
                         canvas.style.display  = 'block';
                     }
-                    setTimeout(connect, 3000);
+                } else {
+                    // Flux actif → afficher vidéo
+                    videoEl.style.display = 'block';
+                    canvas.style.display  = 'none';
+                    captureLastFrame();
                 }
-            }
+            }, 1000);
 
-            connect();
+            // Capture initiale
+            videoEl.addEventListener('play', captureLastFrame);
         })();
-@endforeach
+        @endforeach
+    </script>
 @endpush
