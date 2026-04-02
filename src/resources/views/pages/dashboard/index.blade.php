@@ -88,40 +88,27 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script>
-        const video = document.getElementById("cam-{{ $cam->name }}");
-        const canvas = document.getElementById("freeze-{{ $cam->name }}");
-        const ctx = canvas.getContext('2d');
-        let lastFrame = false;
+    @foreach($activeCameras as $cam)
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const video = document.getElementById("cam-{{ $cam->name }}");
+                const canvas = document.getElementById("freeze-{{ $cam->name }}");
+                const ctx = canvas.getContext('2d');
 
-        if(Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource("http://{{ $serverIp }}:8889/{{ $cam->name }}/index.m3u8");
-            hls.attachMedia(video);
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource("http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8");
+                    hls.attachMedia(video);
 
-            video.addEventListener('play', () => {
-                // Capture initiale
-                canvas.width  = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0);
-                lastFrame = true;
-            });
-
-            video.addEventListener('timeupdate', () => {
-                if(!video.paused && !video.ended) {
-                    canvas.width  = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    ctx.drawImage(video, 0, 0);
-                    lastFrame = true;
+                    hls.on(Hls.Events.ERROR, () => {
+                        video.style.display = 'none';
+                        canvas.style.display = 'block';
+                        ctx.drawImage(video, 0, 0);
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = "http://{{ $serverIp }}:8878/{{ $cam->name }}/index.m3u8";
                 }
             });
-
-            video.addEventListener('error', () => {
-                if(lastFrame) {
-                    video.style.display = 'none';
-                    canvas.style.display = 'block';
-                }
-            });
-        }
-    </script>
+        </script>
+    @endforeach
 @endpush
