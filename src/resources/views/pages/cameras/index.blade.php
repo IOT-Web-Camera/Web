@@ -27,7 +27,8 @@
         @endif
 
         {{-- Table --}}
-        <div class="box p-0" style="overflow: hidden;">
+        <div class="box p-0">
+            <div style="overflow-x: auto;">
             @if($cameras->isEmpty())
                 <div class="has-text-centered" style="padding: 4rem 2rem;">
                 <span class="icon is-large mb-4" style="color: var(--sodium-muted);">

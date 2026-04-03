@@ -29,16 +29,14 @@
 
 <body style="min-height: 100vh; display: flex; flex-direction: column;">
 
-@auth
-    {{-- Overlay mobile --}}
-    <div class="sidebar-overlay" onclick="toggleSidebar()"
-         style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:99;"></div>
+<div class="layout">
 
-    {{-- Sidebar --}}
-    @include('components.sidebar')
-@endauth
+    @auth
+        @include('components.sidebar')
+    @endauth
 
-<main class="main-content" style="flex:1; min-height:100vh; padding:2rem; margin-left:240px;">
+
+<main class="main-content" style="flex:1; min-height:100vh; padding:2rem">
     @include('components.navbar')
 
     <section class="section">
@@ -47,6 +45,8 @@
         </div>
     </section>
 </main>
+
+</div>
 
 @include('components.footer')
 

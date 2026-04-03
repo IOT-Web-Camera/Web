@@ -49,31 +49,42 @@
     <style>
         .sidebar {
             width: 240px;
-            position: fixed;
-            top: 3.25rem;
-            bottom: 0;
-            left: 0;
             background-color: #f5f5f5;
             padding: 2rem 1rem;
             overflow-y: auto;
-            z-index: 100;
-            transition: transform 0.3s ease;
         }
 
-        /* Cacher sur mobile */
+        /* Desktop → sidebar prend de la place */
+        @media (min-width: 769px) {
+            .layout {
+                display: flex;
+            }
+
+            .sidebar {
+                position: relative;
+                height: calc(100vh - 3.25rem);
+            }
+
+            .main-content {
+                margin-left: 0;
+                flex: 1;
+            }
+        }
+
+        /* Mobile → sidebar overlay */
         @media (max-width: 768px) {
             .sidebar {
+                position: fixed;
+                top: 3.25rem;
+                bottom: 0;
+                left: 0;
                 transform: translateX(-100%);
+                z-index: 100;
+                transition: transform 0.3s ease;
             }
+
             .sidebar.is-open {
                 transform: translateX(0);
-                box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-            }
-            .main-content {
-                margin-left: 0 !important;
-            }
-            .sidebar-overlay {
-                display: block;
             }
         }
     </style>
