@@ -60,15 +60,17 @@ class CameraController extends Controller
     }
 
     // Supprime une caméra
-    public function destroy(Request $request)
+    public function destroy(Camera $camera)
     {
-        $camera = Camera::where('id', $request->id)
-            ->where('owner_id', auth()->id())
-            ->firstOrFail();
+        if ($camera->owner_id !== auth()->id()) {
+            abort(403);
+        }
 
         $camera->delete();
 
-        return redirect()->route('cameras.index')->with('success', 'Caméra supprimée.');
+        return redirect()
+            ->route('cameras.index')
+            ->with('success', 'Caméra supprimée.');
     }
 
 

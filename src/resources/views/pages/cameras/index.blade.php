@@ -74,7 +74,7 @@
                                     <a href="{{ route('cameras.show', $cam->name) }}" class="button is-light is-small">
                                         <span class="icon"><i class="fas fa-eye"></i></span>
                                     </a>
-                                    <form action="{{ route('cameras.destroy', $cam->id) }}" method="POST"
+                                    <form action="{{ route('cameras.destroy', $cam) }}" method="POST"
                                           onsubmit="return confirm('Supprimer définitivement cette caméra ?')">
                                         @csrf
                                         @method('DELETE')
